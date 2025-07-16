@@ -15,6 +15,8 @@ from services.Cargo_Permiso import (
     eliminar_permiso_service,
     listar_cargos_con_permisos_service
 )
+from schemas.Negocio.Cliente import ClienteCreate, ClienteUpdate, ClienteResponse
+from services.Negocio.Cliente import registrar_cliente, listar_todos_los_clientes, buscar_cliente, editar_cliente, borrar_cliente
 from db.session import SessionLocal
 from db.base import Base
 import models
@@ -163,6 +165,29 @@ def eliminar_permiso(id_cargo: int, id_permiso: int, db: Session = Depends(get_d
 def listar_cargos_con_permisos(db: Session = Depends(get_db)):
     return listar_cargos_con_permisos_service(db)
 
+# ------------------------------
+#      RUTAS DE CLIENTE
+# ------------------------------
+
+@app.post("/clientes", response_model=ClienteResponse)
+def crear_cliente_endpoint(cliente: ClienteCreate, db: Session = Depends(get_db)):
+    return registrar_cliente(cliente, db)
+
+@app.get("/clientes", response_model=list[ClienteResponse])
+def listar_clientes_endpoint(db: Session = Depends(get_db)):
+    return listar_todos_los_clientes(db)
+
+@app.get("/clientes/{id_cliente}", response_model=ClienteResponse)
+def obtener_cliente_endpoint(id_cliente: int, db: Session = Depends(get_db)):
+    return buscar_cliente(id_cliente, db)
+
+@app.put("/clientes/{id_cliente}", response_model=ClienteResponse)
+def actualizar_cliente_endpoint(id_cliente: int, cliente: ClienteUpdate, db: Session = Depends(get_db)):
+    return editar_cliente(id_cliente, cliente, db)
+
+@app.delete("/clientes/{id_cliente}")
+def eliminar_cliente_endpoint(id_cliente: int, db: Session = Depends(get_db)):
+    return borrar_cliente(id_cliente, db)
 
 
 from fastapi.middleware.cors import CORSMiddleware

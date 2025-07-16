@@ -1,0 +1,4 @@
+cd C:/Users/bedui/Desktop/Backend
+git add .
+git commit -m "Descripción de los cambios"
+git push origin master
