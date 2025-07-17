@@ -20,10 +20,17 @@ from services.Negocio.Cliente import registrar_cliente, listar_todos_los_cliente
 from db.session import SessionLocal
 from db.base import Base
 import models
+from db.session_logic import SessionLocalLogic
 
 
 app = FastAPI()
 
+def get_db_logic():
+    db = SessionLocalLogic()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Dependencia para obtener la sesión de DB en cada request
 def get_db():
@@ -170,23 +177,23 @@ def listar_cargos_con_permisos(db: Session = Depends(get_db)):
 # ------------------------------
 
 @app.post("/clientes", response_model=ClienteResponse)
-def crear_cliente_endpoint(cliente: ClienteCreate, db: Session = Depends(get_db)):
+def crear_cliente_endpoint(cliente: ClienteCreate, db: Session = Depends(get_db_logic)):
     return registrar_cliente(cliente, db)
 
 @app.get("/clientes", response_model=list[ClienteResponse])
-def listar_clientes_endpoint(db: Session = Depends(get_db)):
+def listar_clientes_endpoint(db: Session = Depends(get_db_logic)):
     return listar_todos_los_clientes(db)
 
 @app.get("/clientes/{id_cliente}", response_model=ClienteResponse)
-def obtener_cliente_endpoint(id_cliente: int, db: Session = Depends(get_db)):
+def obtener_cliente_endpoint(id_cliente: int, db: Session = Depends(get_db_logic)):
     return buscar_cliente(id_cliente, db)
 
 @app.put("/clientes/{id_cliente}", response_model=ClienteResponse)
-def actualizar_cliente_endpoint(id_cliente: int, cliente: ClienteUpdate, db: Session = Depends(get_db)):
+def actualizar_cliente_endpoint(id_cliente: int, cliente: ClienteUpdate, db: Session = Depends(get_db_logic)):
     return editar_cliente(id_cliente, cliente, db)
 
 @app.delete("/clientes/{id_cliente}")
-def eliminar_cliente_endpoint(id_cliente: int, db: Session = Depends(get_db)):
+def eliminar_cliente_endpoint(id_cliente: int, db: Session = Depends(get_db_logic)):
     return borrar_cliente(id_cliente, db)
 
 
